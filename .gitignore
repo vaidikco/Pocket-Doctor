@@ -1,0 +1,11 @@
+# Credentials & Secrets
+credentials.txt
+*.env
+.env
+
+# Build & Temporary Files
+.vscode/
+.idea/
+build/
+*.bin
+*.elf
