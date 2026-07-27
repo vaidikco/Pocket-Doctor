@@ -634,29 +634,91 @@ String buildProfileContext() {
 // HTML pages stored in PROGMEM
 const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html>
-<head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PocketDoctor Dashboard</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PocketDoctor Mark 4 — Control Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#f4f4f9;margin:0;padding:20px;color:#333}
-.container{max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-h1{color:#6B0F1A;border-bottom:2px solid #6B0F1A;padding-bottom:10px}
-.card{background:#fafafa;border-left:4px solid #6B0F1A;padding:12px 18px;margin:15px 0;border-radius:6px;transition:0.2s}
-.card:hover{background:#f0f0f0}
-a{text-decoration:none;color:#6B0F1A;font-weight:bold;font-size:1.1em}
-a:hover{text-decoration:underline}
-.status{color:#2e7d32;font-weight:bold}
+:root{--burg:#6B0F1A;--burg-dark:#4A0A12;--accent:#D4384B;--bg-start:#FDF6F7;--bg-end:#E8D8DA;--card-bg:rgba(255,255,255,0.85);--card-border:rgba(232,197,201,0.6);--shadow:0 12px 36px rgba(107,15,26,0.08);--text:#2D0A0E;--text-sub:#7A4048;--radius:20px;--pulse:#2E7D32}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,#F5EAEB 50%,var(--bg-end) 100%);color:var(--text);min-height:100vh;padding:24px 16px;line-height:1.6;display:flex;align-items:center;justify-content:center}
+.app-window{width:100%;max-width:580px;background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.app-window::before{content:'';position:absolute;top:-80px;right:-80px;width:240px;height:240px;background:radial-gradient(circle,rgba(212,56,75,0.12),transparent 70%);pointer-events:none}
+.header{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;margin-bottom:24px;border-bottom:1.5px solid rgba(107,15,26,0.08)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo-badge{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--burg),var(--accent));display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 18px rgba(107,15,26,0.25)}
+.brand-title{font-size:1.35rem;font-weight:800;letter-spacing:-0.5px;color:var(--burg-dark)}
+.brand-sub{font-size:0.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:1px}
+.status-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(46,125,50,0.08);border:1px solid rgba(46,125,50,0.2);padding:6px 14px;border-radius:30px;font-size:0.78rem;font-weight:700;color:var(--pulse)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--pulse);box-shadow:0 0 8px var(--pulse);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+.grid{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.nav-card{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.7);border:1px solid rgba(232,197,201,0.5);border-radius:16px;padding:18px 20px;text-decoration:none;color:var(--text);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+.nav-card:hover{transform:translateY(-3px);background:#fff;border-color:var(--burg);box-shadow:0 10px 24px rgba(107,15,26,0.12)}
+.card-left{display:flex;align-items:center;gap:16px}
+.card-icon{width:42px;height:42px;border-radius:12px;background:rgba(107,15,26,0.06);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--burg);transition:background 0.2s}
+.nav-card:hover .card-icon{background:var(--burg);color:#fff}
+.card-label{font-size:0.98rem;font-weight:700;color:var(--burg-dark)}
+.card-desc{font-size:0.78rem;color:var(--text-sub);margin-top:2px}
+.arrow-icon{font-size:1.2rem;color:var(--text-sub);transition:transform 0.2s,color 0.2s}
+.nav-card:hover .arrow-icon{transform:translateX(4px);color:var(--burg)}
+.meta-box{background:rgba(107,15,26,0.04);border:1px dashed rgba(107,15,26,0.18);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;font-size:0.82rem;color:var(--text-sub);font-weight:600}
+.meta-chip{background:#fff;padding:4px 10px;border-radius:8px;border:1px solid rgba(107,15,26,0.1);color:var(--burg-dark);font-family:monospace;font-size:0.85rem}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>🩺 PocketDoctor v3</h1>
-<p><span class="status">●</span> System running</p>
-<div class="card"><a href="/wifi">📶 Wi‑Fi Settings</a></div>
-<div class="card"><a href="/profiles">👤 Profile Management</a></div>
-<div class="card"><a href="/report">📄 Latest Report</a></div>
-<div style="margin-top:30px;font-size:0.9em;color:#888">
-IP: %IP%<br>Uptime: %UPTIME%
+<div class="app-window">
+<div class="header">
+<div class="brand">
+<div class="logo-badge">🩺</div>
+<div>
+<div class="brand-title">PocketDoctor</div>
+<div class="brand-sub">Mark 4 Control Portal · By Vaidik Khurana</div>
+</div>
+</div>
+<div class="status-pill"><span class="status-dot"></span> Online</div>
+</div>
+<div class="grid">
+<a href="/wifi" class="nav-card">
+<div class="card-left">
+<div class="card-icon">📶</div>
+<div>
+<div class="card-label">Wi-Fi Configuration</div>
+<div class="card-desc">Update network credentials and reboot system</div>
+</div>
+</div>
+<span class="arrow-icon">→</span>
+</a>
+<a href="/profiles" class="nav-card">
+<div class="card-left">
+<div class="card-icon">👤</div>
+<div>
+<div class="card-label">Patient Profiles</div>
+<div class="card-desc">Manage saved records, body metrics & preferences</div>
+</div>
+</div>
+<span class="arrow-icon">→</span>
+</a>
+<a href="/report" class="nav-card">
+<div class="card-left">
+<div class="card-icon">📄</div>
+<div>
+<div class="card-label">Clinical Diagnostic Report</div>
+<div class="card-desc">View and print the latest AI diagnostic analysis</div>
+</div>
+</div>
+<span class="arrow-icon">→</span>
+</a>
+</div>
+<div class="meta-box">
+<span>IP: <span class="meta-chip">%IP%</span></span>
+<span>Uptime: <span class="meta-chip">%UPTIME%</span></span>
+</div>
+<div style="text-align:center;margin-top:16px;font-size:0.75rem;color:var(--text-sub);font-weight:700">
+Designed & Engineered by <span style="color:var(--burg-dark)">Vaidik Khurana</span>
 </div>
 </div>
 </body>
@@ -665,31 +727,49 @@ IP: %IP%<br>Uptime: %UPTIME%
 
 const char WIFI_HTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html>
-<head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wi‑Fi Settings</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wi-Fi Configuration — PocketDoctor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#f4f4f9;margin:0;padding:20px;color:#333}
-.container{max-width:500px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-h1{color:#6B0F1A}
-label{display:block;margin:12px 0 4px;font-weight:bold}
-input[type=text],input[type=password]{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
-input[type=submit]{background:#6B0F1A;color:#fff;padding:12px 20px;border:none;border-radius:6px;cursor:pointer;font-size:1em;margin-top:10px}
-input[type=submit]:hover{background:#8B1A2A}
-.back{display:inline-block;margin-top:20px;color:#6B0F1A;text-decoration:none}
+:root{--burg:#6B0F1A;--burg-dark:#4A0A12;--accent:#D4384B;--bg-start:#FDF6F7;--bg-end:#E8D8DA;--card-bg:rgba(255,255,255,0.88);--card-border:rgba(232,197,201,0.6);--shadow:0 12px 36px rgba(107,15,26,0.08);--text:#2D0A0E;--text-sub:#7A4048;--radius:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,#F5EAEB 50%,var(--bg-end) 100%);color:var(--text);min-height:100vh;padding:24px 16px;line-height:1.6;display:flex;align-items:center;justify-content:center}
+.app-window{width:100%;max-width:500px;background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow)}
+.header{margin-bottom:24px;border-bottom:1.5px solid rgba(107,15,26,0.08);padding-bottom:16px}
+.title{font-size:1.3rem;font-weight:800;color:var(--burg-dark);display:flex;align-items:center;gap:10px}
+.subtitle{font-size:0.82rem;color:var(--text-sub);margin-top:4px}
+.form-group{margin-bottom:18px}
+label{display:block;font-size:0.85rem;font-weight:700;color:var(--burg-dark);margin-bottom:6px}
+input[type=text],input[type=password]{width:100%;padding:12px 16px;font-size:0.95rem;font-family:inherit;background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,197,201,0.8);border-radius:12px;color:var(--text);transition:all 0.2s}
+input[type=text]:focus,input[type=password]:focus{outline:none;border-color:var(--burg);box-shadow:0 0 0 4px rgba(107,15,26,0.12);background:#fff}
+.btn-submit{width:100%;margin-top:10px;padding:14px;font-size:0.98rem;font-weight:700;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--burg),var(--accent));border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(107,15,26,0.25);transition:all 0.2s}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(107,15,26,0.35)}
+.back-link{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:0.88rem;font-weight:700;color:var(--burg);text-decoration:none;transition:color 0.2s}
+.back-link:hover{color:var(--accent);text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>📶 Wi‑Fi Configuration</h1>
+<div class="app-window">
+<div class="header">
+<div class="title">📶 Wi-Fi Configuration</div>
+<div class="subtitle">Configure local network access credentials</div>
+</div>
 <form action="/wifi/update" method="POST">
-<label>SSID</label>
-<input type="text" name="ssid" value="%SSID%" required>
-<label>Password</label>
-<input type="password" name="password" value="%PASS%">
-<input type="submit" value="Save & Reboot">
+<div class="form-group">
+<label>Network SSID</label>
+<input type="text" name="ssid" value="%SSID%" required placeholder="Enter Wi-Fi SSID">
+</div>
+<div class="form-group">
+<label>Wi-Fi Password</label>
+<input type="password" name="password" value="%PASS%" placeholder="Enter Wi-Fi Password">
+</div>
+<button type="submit" class="btn-submit">Save Settings & Reboot Device</button>
 </form>
-<a class="back" href="/">← Back to Dashboard</a>
+<a class="back-link" href="/">← Back to Control Portal</a>
 </div>
 </body>
 </html>
@@ -697,29 +777,51 @@ input[type=submit]:hover{background:#8B1A2A}
 
 const char PROFILES_HTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html>
-<head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Profiles</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patient Profiles — PocketDoctor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#f4f4f9;margin:0;padding:20px;color:#333}
-.container{max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-h1{color:#6B0F1A;border-bottom:2px solid #6B0F1A;padding-bottom:10px}
-.profile{background:#fafafa;padding:12px;margin:8px 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center}
-.profile .name{font-weight:bold}
-.actions a{margin-left:10px;color:#6B0F1A;text-decoration:none;font-size:0.9em}
-.actions a:hover{text-decoration:underline}
-.new{display:inline-block;margin:15px 0;background:#6B0F1A;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none}
-.new:hover{background:#8B1A2A}
-.back{display:inline-block;margin-top:20px;color:#6B0F1A;text-decoration:none}
-.empty{color:#888;font-style:italic}
+:root{--burg:#6B0F1A;--burg-dark:#4A0A12;--accent:#D4384B;--bg-start:#FDF6F7;--bg-end:#E8D8DA;--card-bg:rgba(255,255,255,0.88);--card-border:rgba(232,197,201,0.6);--shadow:0 12px 36px rgba(107,15,26,0.08);--text:#2D0A0E;--text-sub:#7A4048;--radius:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,#F5EAEB 50%,var(--bg-end) 100%);color:var(--text);min-height:100vh;padding:24px 16px;line-height:1.6;display:flex;align-items:center;justify-content:center}
+.app-window{width:100%;max-width:580px;background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;border-bottom:1.5px solid rgba(107,15,26,0.08);padding-bottom:16px}
+.title{font-size:1.3rem;font-weight:800;color:var(--burg-dark);display:flex;align-items:center;gap:10px}
+.subtitle{font-size:0.82rem;color:var(--text-sub);margin-top:2px}
+.profile-list{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.profile{background:#fff;border:1.5px solid rgba(232,197,201,0.6);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s}
+.profile:hover{border-color:var(--burg);box-shadow:0 6px 20px rgba(107,15,26,0.08)}
+.profile .name{font-size:1rem;font-weight:800;color:var(--burg-dark)}
+.actions{display:flex;gap:10px}
+.actions a{text-decoration:none;font-size:0.82rem;font-weight:700;padding:6px 12px;border-radius:8px;transition:all 0.2s}
+.actions a.edit{background:rgba(107,15,26,0.08);color:var(--burg)}
+.actions a.edit:hover{background:var(--burg);color:#fff}
+.actions a.delete{background:rgba(192,57,43,0.08);color:#C0392B}
+.actions a.delete:hover{background:#C0392B;color:#fff}
+.btn-new{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;font-size:0.95rem;font-weight:700;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--burg),var(--accent));border-radius:12px;text-decoration:none;box-shadow:0 6px 20px rgba(107,15,26,0.22);transition:all 0.2s}
+.btn-new:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(107,15,26,0.32)}
+.back-link{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:0.88rem;font-weight:700;color:var(--burg);text-decoration:none}
+.back-link:hover{color:var(--accent);text-decoration:underline}
+.empty{color:var(--text-sub);font-style:italic;text-align:center;padding:20px;background:rgba(255,255,255,0.5);border-radius:12px}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>👤 Profiles</h1>
+<div class="app-window">
+<div class="header">
+<div>
+<div class="title">👤 Patient Profiles</div>
+<div class="subtitle">EEPROM Persistent Medical Profiles</div>
+</div>
+</div>
+<div class="profile-list">
 %PROFILES%
-<a class="new" href="/profile/edit?new=1">+ Create New</a>
-<br><a class="back" href="/">← Back to Dashboard</a>
+</div>
+<a class="btn-new" href="/profile/edit?new=1">+ Create New Patient Profile</a>
+<a class="back-link" href="/">← Back to Control Portal</a>
 </div>
 </body>
 </html>
@@ -727,51 +829,85 @@ h1{color:#6B0F1A;border-bottom:2px solid #6B0F1A;padding-bottom:10px}
 
 const char PROFILE_EDIT_HTML[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html>
-<head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit Profile</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit Profile — PocketDoctor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#f4f4f9;margin:0;padding:20px;color:#333}
-.container{max-width:500px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-h1{color:#6B0F1A}
-label{display:block;margin:10px 0 4px;font-weight:bold}
-input,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
-input[type=submit]{background:#6B0F1A;color:#fff;padding:12px;border:none;border-radius:6px;cursor:pointer;font-size:1em;margin-top:12px}
-input[type=submit]:hover{background:#8B1A2A}
-.back{display:inline-block;margin-top:20px;color:#6B0F1A;text-decoration:none}
+:root{--burg:#6B0F1A;--burg-dark:#4A0A12;--accent:#D4384B;--bg-start:#FDF6F7;--bg-end:#E8D8DA;--card-bg:rgba(255,255,255,0.88);--card-border:rgba(232,197,201,0.6);--shadow:0 12px 36px rgba(107,15,26,0.08);--text:#2D0A0E;--text-sub:#7A4048;--radius:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg-start) 0%,#F5EAEB 50%,var(--bg-end) 100%);color:var(--text);min-height:100vh;padding:24px 16px;line-height:1.6;display:flex;align-items:center;justify-content:center}
+.app-window{width:100%;max-width:520px;background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow)}
+.header{margin-bottom:24px;border-bottom:1.5px solid rgba(107,15,26,0.08);padding-bottom:14px}
+.title{font-size:1.3rem;font-weight:800;color:var(--burg-dark)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full-width{grid-column:span 2}
+.form-group{margin-bottom:14px}
+label{display:block;font-size:0.82rem;font-weight:700;color:var(--burg-dark);margin-bottom:5px}
+input,select{width:100%;padding:10px 14px;font-size:0.92rem;font-family:inherit;background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,197,201,0.8);border-radius:12px;color:var(--text);transition:all 0.2s}
+input:focus,select:focus{outline:none;border-color:var(--burg);box-shadow:0 0 0 4px rgba(107,15,26,0.12);background:#fff}
+.btn-submit{width:100%;margin-top:12px;padding:14px;font-size:0.95rem;font-weight:700;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--burg),var(--accent));border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(107,15,26,0.25);transition:all 0.2s}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(107,15,26,0.35)}
+.back-link{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:0.88rem;font-weight:700;color:var(--burg);text-decoration:none}
+.back-link:hover{color:var(--accent);text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>%HEADER%</h1>
+<div class="app-window">
+<div class="header">
+<div class="title">%HEADER%</div>
+</div>
 <form action="/profile/update" method="POST">
 <input type="hidden" name="index" value="%INDEX%">
-<label>Name</label><input type="text" name="name" value="%NAME%">
-<label>Age</label><input type="number" name="age" value="%AGE%">
-<label>Height (cm)</label><input type="number" name="height" value="%HEIGHT%">
-<label>Weight (kg)</label><input type="number" name="weight" value="%WEIGHT%">
-<label>Intoxication</label>
+<div class="form-group full-width">
+<label>Patient Full Name</label>
+<input type="text" name="name" value="%NAME%" required placeholder="Enter full name">
+</div>
+<div class="form-grid full-width">
+<div class="form-group">
+<label>Age (years)</label>
+<input type="number" name="age" value="%AGE%" min="1" max="120" required>
+</div>
+<div class="form-group">
+<label>Height (cm)</label>
+<input type="number" name="height" value="%HEIGHT%" min="50" max="250" required>
+</div>
+</div>
+<div class="form-group full-width">
+<label>Weight (kg)</label>
+<input type="number" name="weight" value="%WEIGHT%" min="20" max="300" required>
+</div>
+<div class="form-group full-width">
+<label>Intoxication History</label>
 <select name="intox">
 <option value="None" %SEL_NONE%>None</option>
 <option value="Alcohol" %SEL_ALCOHOL%>Alcohol</option>
 <option value="Tobacco" %SEL_TOBACCO%>Tobacco</option>
 <option value="Both" %SEL_BOTH%>Both</option>
 </select>
-<label>Medical History</label>
+</div>
+<div class="form-group full-width">
+<label>Chronic Medical History</label>
 <select name="history">
 <option value="1" %SEL_HIST_YES%>Yes</option>
 <option value="0" %SEL_HIST_NO%>No</option>
 </select>
-<label>Treatment Preference</label>
+</div>
+<div class="form-group full-width">
+<label>Preferred Medical Modality</label>
 <select name="treatment">
 <option value="Allopathy" %SEL_ALLOPATHY%>Allopathy</option>
 <option value="Homeopathy" %SEL_HOMEOPATHY%>Homeopathy</option>
 <option value="Ayurvedic" %SEL_AYURVEDIC%>Ayurvedic</option>
 <option value="All types" %SEL_ALLTYPES%>All types</option>
 </select>
-<input type="submit" value="Save Profile">
+</div>
+<button type="submit" class="btn-submit full-width">Save Profile Record</button>
 </form>
-<a class="back" href="/profiles">← Back to Profiles</a>
+<a class="back-link" href="/profiles">← Back to Patient Profiles</a>
 </div>
 </body>
 </html>
@@ -1164,115 +1300,115 @@ String sendToGroq(String userMessage, bool isFinalDiagnosis) {
 
 // -------------------- HTML REPORT --------------------
 String createComprehensiveHTMLReport() {
-  // (Same beautiful HTML report as original – unchanged)
   String html = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>";
-  html += "<title>PocketDoctor — Medical Report</title>";
+  html += "<title>PocketDoctor Mark 4 — Clinical Prescription & Triage Report</title>";
+  html += "<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>";
+  html += "<link href='https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' rel='stylesheet'>";
   html += "<style>";
   html += "*{margin:0;padding:0;box-sizing:border-box}";
-  html += ":root{--burg:#6B0F1A;--burg2:#8B1A2A;--burg3:#A52535;--rose:#C94050;--blush:#F2C4C8;--white:#FFFFFF;--cream:#FDF6F7;--offwhite:#F7ECED;--dark:#1A0508;--card:#FFFFFF;--card2:#FDF6F7;--border:#E8C5C9;--text:#2D0A0E;--text2:#7A4048;--gold:#C9860A;--green:#1A6B2A;--radius:14px;--shadow:0 4px 24px rgba(107,15,26,0.12);}";
+  html += ":root{--burg:#5A0C16;--burg-mid:#7A1422;--burg-bright:#9E1B2C;--accent:#E63946;--cream:#FDF8F8;--bg-canvas:#F3E9EA;--card-bg:rgba(255,255,255,0.92);--card-border:rgba(158,27,44,0.18);--shadow:0 16px 48px rgba(90,12,22,0.12);--text:#2B090D;--text-sub:#6B3037;--gold:#D97706;--green:#15803D;--red:#DC2626;--radius:22px;}";
   html += "html{scroll-behavior:smooth}";
-  html += "body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--offwhite);color:var(--text);line-height:1.7;min-height:100vh}";
-  html += "body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(107,15,26,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(107,15,26,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}";
-  html += ".page{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 16px 60px}";
-  html += ".header{background:linear-gradient(135deg,var(--burg) 0%,var(--burg2) 60%,var(--burg3) 100%);border-radius:var(--radius);padding:40px 36px 32px;margin-bottom:28px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(107,15,26,0.35)}";
-  html += ".header::after{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(242,196,200,0.15),transparent 70%);pointer-events:none}";
-  html += ".header::before{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.06),transparent 70%);pointer-events:none}";
-  html += ".header-top{display:flex;align-items:center;gap:18px;margin-bottom:18px}";
-  html += ".logo-ring{width:56px;height:56px;border-radius:50%;border:2px solid rgba(242,196,200,0.6);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 0 18px rgba(242,196,200,0.25);background:rgba(255,255,255,0.1)}";
-  html += ".header h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:var(--white);letter-spacing:-0.5px}";
-  html += ".header-sub{color:var(--blush);font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;opacity:0.85}";
-  html += ".header-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}";
-  html += ".meta-chip{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:30px;padding:4px 14px;font-size:0.78rem;color:var(--white);font-weight:500;backdrop-filter:blur(4px)}";
-  html += ".summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}";
-  html += ".scard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.2s;border-top:3px solid var(--burg)}";
-  html += ".scard:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(107,15,26,0.18)}";
-  html += ".scard-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text2);margin-bottom:6px;font-weight:600}";
-  html += ".scard-value{font-size:1.2rem;font-weight:700;color:var(--dark)}.scard-value.burg{color:var(--burg)}.scard-value.red{color:#C0392B}.scard-value.green{color:var(--green)}.scard-value.gold{color:var(--gold)}";
-  html += ".scard-icon{font-size:1.5rem;margin-bottom:8px}";
-  html += ".critical-banner{background:linear-gradient(135deg,rgba(192,57,43,0.1),rgba(192,57,43,0.04));border:1.5px solid #C0392B;border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;box-shadow:0 0 24px rgba(192,57,43,0.15)}";
-  html += ".critical-banner .icon{font-size:2rem;flex-shrink:0;animation:pulse 1.5s infinite}";
-  html += "@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}";
-  html += ".critical-banner h3{color:#C0392B;font-size:1rem;font-weight:700;margin-bottom:4px}.critical-banner p{color:var(--text);font-size:0.9rem}";
-  html += ".section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px 26px;margin-bottom:20px;box-shadow:var(--shadow)}";
-  html += ".section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--offwhite)}";
-  html += ".section-icon{width:38px;height:38px;border-radius:10px;background:var(--burg);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}";
-  html += ".section h2{font-size:1.05rem;font-weight:700;color:var(--dark)}.section h3{font-size:0.85rem;font-weight:700;color:var(--burg);margin:18px 0 8px;text-transform:uppercase;letter-spacing:0.8px}";
-  html += ".box-burg{background:linear-gradient(135deg,rgba(107,15,26,0.06),rgba(107,15,26,0.02));border:1px solid rgba(107,15,26,0.2);border-left:4px solid var(--burg);border-radius:8px;padding:14px 18px;margin:10px 0}";
-  html += ".box-gold{background:rgba(201,134,10,0.07);border:1px solid rgba(201,134,10,0.3);border-left:4px solid var(--gold);border-radius:8px;padding:14px 18px;margin:10px 0;color:#7A5500}";
-  html += ".box-red{background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.3);border-left:4px solid #C0392B;border-radius:8px;padding:14px 18px;margin:10px 0}";
-  html += ".box-green{background:rgba(26,107,42,0.07);border:1px solid rgba(26,107,42,0.25);border-left:4px solid var(--green);border-radius:8px;padding:14px 18px;margin:10px 0}";
-  html += "ul.styled{list-style:none;padding:0;margin:6px 0}ul.styled li{padding:7px 0 7px 24px;position:relative;font-size:0.9rem;color:var(--text);border-bottom:1px solid var(--offwhite)}ul.styled li:last-child{border-bottom:none}ul.styled li::before{content:'▸';position:absolute;left:0;color:var(--burg);font-size:0.85rem;top:8px}ul.red-list li::before{color:#C0392B}";
-  html += "table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.88rem}thead th{background:var(--burg);color:var(--white);padding:10px 14px;text-align:left;font-weight:600;letter-spacing:0.5px;font-size:0.8rem;text-transform:uppercase}tbody td{padding:10px 14px;border-bottom:1px solid var(--offwhite);color:var(--text);vertical-align:top}tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--cream)}";
-  html += ".timeline{display:flex;flex-direction:column;gap:0;margin:10px 0}.tl-item{display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--offwhite)}.tl-item:last-child{border-bottom:none}.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--burg);flex-shrink:0;margin-top:6px;box-shadow:0 0 6px rgba(107,15,26,0.4)}.tl-content .tl-time{font-size:0.75rem;color:var(--burg);font-weight:700;text-transform:uppercase;letter-spacing:0.8px}.tl-content .tl-text{font-size:0.88rem;color:var(--text);margin-top:2px}";
-  html += ".acc-bar-wrap{background:var(--offwhite);border-radius:30px;height:10px;margin:8px 0;overflow:hidden;border:1px solid var(--border)}.acc-bar{height:100%;border-radius:30px;background:linear-gradient(90deg,var(--burg),var(--rose));transition:width 1s ease}";
-  html += ".disclaimer{background:rgba(201,134,10,0.05);border:1px solid rgba(201,134,10,0.3);border-radius:var(--radius);padding:24px;margin-top:28px}.disclaimer h3{color:var(--gold);font-size:0.95rem;margin-bottom:10px;font-weight:700}.disclaimer p{font-size:0.84rem;color:var(--text2);line-height:1.6;margin-bottom:6px}";
-  html += ".footer{text-align:center;margin-top:40px;color:var(--text2);font-size:0.78rem;letter-spacing:0.5px}.footer span{color:var(--burg);font-weight:600}";
-  html += "@media(max-width:600px){.header{padding:24px 18px}.section{padding:20px 16px}.summary-row{grid-template-columns:1fr 1fr}}";
+  html += "body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--cream) 0%,#F0E2E4 50%,var(--bg-canvas) 100%);color:var(--text);line-height:1.7;min-height:100vh;padding:36px 18px 70px}";
+  html += ".page{max-width:980px;margin:0 auto}";
+  html += ".rx-header{background:linear-gradient(135deg,var(--burg) 0%,var(--burg-mid) 60%,var(--burg-bright) 100%);border-radius:var(--radius);padding:44px 40px 36px;margin-bottom:30px;position:relative;overflow:hidden;box-shadow:0 14px 40px rgba(90,12,22,0.32);color:#fff}";
+  html += ".rx-header::before{content:'Rx';position:absolute;right:20px;bottom:-15px;font-family:'Outfit',sans-serif;font-size:12rem;font-weight:800;color:rgba(255,255,255,0.06);pointer-events:none;line-height:1}";
+  html += ".header-top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:20px}";
+  html += ".rx-badge{display:flex;align-items:center;gap:16px}";
+  html += ".rx-logo{width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;font-size:30px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}";
+  html += ".rx-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-0.5px;color:#fff}";
+  html += ".rx-header-sub{color:rgba(255,255,255,0.85);font-size:0.86rem;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;font-weight:700}";
+  html += ".doc-stamp{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:14px;padding:10px 18px;text-align:right;backdrop-filter:blur(6px)}";
+  html += ".stamp-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.75);font-weight:700}";
+  html += ".stamp-val{font-size:0.95rem;font-weight:800;color:#fff;font-family:monospace}";
+  html += ".patient-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}";
+  html += ".p-chip{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.22);border-radius:30px;padding:8px 16px;font-size:0.84rem;color:#fff;font-weight:600;backdrop-filter:blur(6px);display:flex;align-items:center;gap:8px}";
+  html += ".summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin-bottom:30px}";
+  html += ".scard{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:24px 22px;box-shadow:var(--shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);border-top:4px solid var(--burg)}";
+  html += ".scard:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(90,12,22,0.16)}";
+  html += ".scard-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-sub);margin-bottom:8px;font-weight:700}";
+  html += ".scard-value{font-family:'Outfit',sans-serif;font-size:1.35rem;font-weight:800;color:var(--burg)}.scard-value.red{color:var(--red)}.scard-value.green{color:var(--green)}.scard-value.gold{color:var(--gold)}";
+  html += ".scard-icon{font-size:1.8rem;margin-bottom:12px}";
+  html += ".critical-banner{background:linear-gradient(135deg,rgba(220,38,38,0.12),rgba(220,38,38,0.04));border:1.5px solid var(--red);border-radius:var(--radius);padding:24px 28px;margin-bottom:30px;display:flex;align-items:flex-start;gap:20px;box-shadow:0 10px 32px rgba(220,38,38,0.15)}";
+  html += ".critical-banner .icon{font-size:2.4rem;flex-shrink:0;animation:pulse 1.5s infinite}";
+  html += "@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.9)} }";
+  html += ".critical-banner h3{color:var(--red);font-size:1.15rem;font-weight:800;margin-bottom:4px}.critical-banner p{color:var(--text);font-size:0.94rem;font-weight:500}";
+  html += ".section{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 30px;margin-bottom:26px;box-shadow:var(--shadow)}";
+  html += ".section-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1.5px solid rgba(90,12,22,0.08)}";
+  html += ".section-icon{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--burg),var(--burg-bright));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;flex-shrink:0;box-shadow:0 6px 18px rgba(90,12,22,0.22)}";
+  html += ".section h2{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;color:var(--burg)}.section h3{font-size:0.9rem;font-weight:700;color:var(--burg-mid);margin:22px 0 12px;text-transform:uppercase;letter-spacing:1px}";
+  html += ".box-burg{background:rgba(90,12,22,0.05);border:1px solid rgba(90,12,22,0.18);border-left:4px solid var(--burg);border-radius:14px;padding:18px 22px;margin:14px 0}";
+  html += ".box-gold{background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.3);border-left:4px solid var(--gold);border-radius:14px;padding:18px 22px;margin:14px 0;color:#92400E}";
+  html += ".box-red{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.3);border-left:4px solid var(--red);border-radius:14px;padding:18px 22px;margin:14px 0}";
+  html += ".box-green{background:rgba(21,128,61,0.08);border:1px solid rgba(21,128,61,0.25);border-left:4px solid var(--green);border-radius:14px;padding:18px 22px;margin:14px 0;color:var(--green)}";
+  html += "ul.styled{list-style:none;padding:0;margin:10px 0}ul.styled li{padding:10px 0 10px 30px;position:relative;font-size:0.94rem;color:var(--text);border-bottom:1px solid rgba(90,12,22,0.06)}ul.styled li:last-child{border-bottom:none}ul.styled li::before{content:'▸';position:absolute;left:4px;color:var(--burg-bright);font-size:1.1rem;font-weight:800;top:8px}ul.red-list li::before{color:var(--red)}";
+  html += "table.rx-table{width:100%;border-collapse:separate;border-spacing:0;margin:16px 0;font-size:0.92rem;border-radius:14px;overflow:hidden;border:1px solid rgba(90,12,22,0.12)}table.rx-table thead th{background:var(--burg);color:#fff;padding:14px 18px;text-align:left;font-family:'Outfit',sans-serif;font-weight:700;letter-spacing:0.5px;font-size:0.82rem;text-transform:uppercase}table.rx-table tbody td{padding:14px 18px;border-bottom:1px solid rgba(90,12,22,0.06);color:var(--text);vertical-align:top;background:#fff}table.rx-table tbody tr:last-child td{border-bottom:none}table.rx-table tbody tr:hover td{background:rgba(90,12,22,0.03)}";
+  html += ".timeline{display:flex;flex-direction:column;gap:0;margin:16px 0}.tl-item{display:flex;gap:20px;align-items:flex-start;padding:16px 0;border-bottom:1px solid rgba(90,12,22,0.06)}.tl-item:last-child{border-bottom:none}.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--burg-bright);flex-shrink:0;margin-top:6px;box-shadow:0 0 12px rgba(158,27,44,0.5)}.tl-content .tl-time{font-family:'Outfit',sans-serif;font-size:0.82rem;color:var(--burg);font-weight:800;text-transform:uppercase;letter-spacing:1px}.tl-content .tl-text{font-size:0.92rem;color:var(--text);margin-top:3px}";
+  html += ".acc-bar-wrap{background:rgba(90,12,22,0.08);border-radius:30px;height:14px;margin:10px 0;overflow:hidden;border:1px solid rgba(90,12,22,0.15)}.acc-bar{height:100%;border-radius:30px;background:linear-gradient(90deg,var(--burg),var(--burg-bright));transition:width 1s ease}";
+  html += ".attestation{background:rgba(90,12,22,0.03);border:1.5px solid rgba(90,12,22,0.15);border-radius:var(--radius);padding:28px;margin-top:34px;display:flex;flex-direction:column;gap:14px}";
+  html += ".att-title{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:var(--burg);display:flex;align-items:center;gap:10px}";
+  html += ".att-body{font-size:0.86rem;color:var(--text-sub);line-height:1.75}";
+  html += ".sig-block{margin-top:12px;padding-top:14px;border-top:1px dashed rgba(90,12,22,0.2);display:flex;align-items:center;justify-content:space-between;font-size:0.82rem;color:var(--text-sub);font-weight:700}";
+  html += ".footer{text-align:center;margin-top:44px;color:var(--text-sub);font-size:0.84rem;letter-spacing:0.5px;font-weight:600}.footer span{color:var(--burg);font-weight:800}";
+  html += "@media(max-width:600px){.rx-header{padding:30px 22px}.section{padding:24px 20px}.summary-row{grid-template-columns:1fr 1fr}}";
   html += "</style></head><body><div class='page'>";
 
-  html += "<div class='header'><div class='header-top'><div class='logo-ring'>🩺</div><div><h1>PocketDoctor Report</h1><div class='header-sub'>AI-Powered Preliminary Diagnostic Assessment</div></div></div>";
-  html += "<div class='header-meta'><span class='meta-chip'>👤 " + currentProfile.name + "</span><span class='meta-chip'>🎂 " + String(currentProfile.age) + " yrs</span><span class='meta-chip'>⚖️ " + String(currentProfile.weight) + " kg</span><span class='meta-chip'>📏 " + String(currentProfile.height) + " cm</span><span class='meta-chip'>💊 " + currentProfile.treatmentPreference + "</span></div></div>";
+  html += "<div class='rx-header'><div class='header-top'><div class='rx-badge'><div class='rx-logo'>🩺</div><div><h1>Prescription & Triage Report</h1><div class='rx-header-sub'>PocketDoctor Mark 4 Autonomous Clinical Triage</div></div></div><div class='doc-stamp'><div class='stamp-title'>System Model</div><div class='stamp-val'>MK4-LLAMA-3.3</div></div></div>";
+  html += "<div class='patient-grid'><div class='p-chip'>👤 <strong>" + currentProfile.name + "</strong></div><div class='p-chip'>🎂 <strong>" + String(currentProfile.age) + " yrs</strong></div><div class='p-chip'>⚖️ <strong>" + String(currentProfile.weight) + " kg</strong></div><div class='p-chip'>📏 <strong>" + String(currentProfile.height) + " cm</strong></div><div class='p-chip'>💊 <strong>" + currentProfile.treatmentPreference + "</strong></div></div></div>";
 
   html += "<div class='summary-row'>";
-  html += "<div class='scard'><div class='scard-icon'>🔬</div><div class='scard-label'>Primary Diagnosis</div><div class='scard-value burg'>" + diagnosedDisease + "</div></div>";
+  html += "<div class='scard'><div class='scard-icon'>🔬</div><div class='scard-label'>Primary Diagnosis</div><div class='scard-value'>" + diagnosedDisease + "</div></div>";
   html += "<div class='scard'><div class='scard-icon'>📊</div><div class='scard-label'>AI Confidence</div><div class='scard-value gold'>" + accuracy + "</div></div>";
   bool isCritical = critical.indexOf("Yes") >= 0;
-  html += "<div class='scard'><div class='scard-icon'>" + String(isCritical ? "🚨" : "✅") + "</div><div class='scard-label'>Priority Level</div><div class='scard-value " + String(isCritical ? "red" : "green") + "'>" + String(isCritical ? "URGENT" : "STANDARD") + "</div></div>";
-  html += "<div class='scard'><div class='scard-icon'>💊</div><div class='scard-label'>Treatment Type</div><div class='scard-value'>" + currentProfile.treatmentPreference + "</div></div>";
+  html += "<div class='scard'><div class='scard-icon'>" + String(isCritical ? "🚨" : "✅") + "</div><div class='scard-label'>Priority Status</div><div class='scard-value " + String(isCritical ? "red" : "green") + "'>" + String(isCritical ? "URGENT TRIAGE" : "STANDARD CARE") + "</div></div>";
+  html += "<div class='scard'><div class='scard-icon'>💊</div><div class='scard-label'>Modality</div><div class='scard-value'>" + currentProfile.treatmentPreference + "</div></div>";
   html += "</div>";
 
   if (isCritical) {
-    html += "<div class='critical-banner'><div class='icon'>🚨</div><div><h3>CRITICAL STATUS — IMMEDIATE ACTION REQUIRED</h3><p>This condition requires urgent medical evaluation. Do not delay — seek emergency care or visit a hospital immediately.</p></div></div>";
+    html += "<div class='critical-banner'><div class='icon'>🚨</div><div><h3>CRITICAL TRIAGE ALERT — EMERGENCY CARE RECOMMENDED</h3><p>Patient symptoms indicate severe condition risk. Please proceed immediately to an emergency care facility or hospital for physical evaluation.</p></div></div>";
   }
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>🔬</div><h2>Diagnostic Assessment</h2></div>";
-  html += "<h3>Condition</h3><div class='box-burg'><strong style='color:var(--burg);font-size:1.05rem'>" + diagnosedDisease + "</strong> &nbsp;—&nbsp; <span style='color:var(--text)'>diagnosed based on reported symptoms, patient profile, and 10-question AI follow-up.</span></div>";
-  html += "<h3>Confidence Score</h3><div style='display:flex;align-items:center;gap:12px'><div class='acc-bar-wrap' style='flex:1'><div class='acc-bar' style='width:" + accuracy + "'></div></div><span style='color:var(--gold);font-weight:700;font-size:1rem'>" + accuracy + "</span></div>";
-  html += "<p style='font-size:0.82rem;color:var(--text2);margin-top:8px'>Preliminary AI estimate. Accuracy reflects symptom clarity and answer consistency — not a laboratory result.</p></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>🔬</div><h2>Clinical Diagnostic Assessment</h2></div>";
+  html += "<h3>Primary Condition Identified</h3><div class='box-burg'><strong style='color:var(--burg);font-size:1.1rem'>" + diagnosedDisease + "</strong> &nbsp;—&nbsp; <span style='color:var(--text)'>Derived from symptom intake, EEPROM profile biometrics, and multi-turn LLM clinical reasoning.</span></div>";
+  html += "<h3>AI Confidence Matrix</h3><div style='display:flex;align-items:center;gap:16px'><div class='acc-bar-wrap' style='flex:1'><div class='acc-bar' style='width:" + accuracy + "'></div></div><span style='color:var(--gold);font-weight:800;font-size:1.1rem;font-family:monospace'>" + accuracy + "</span></div>";
+  html += "<p style='font-size:0.84rem;color:var(--text-sub);margin-top:10px'>Confidence score derived from symptom clarity, consistency of responses, and medical KB alignment.</p></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>💊</div><h2>Medication Protocol</h2></div>";
-  html += "<div class='box-burg'><span style='color:var(--burg);font-weight:700'>Suggested Medicines (" + currentProfile.treatmentPreference + "):</span><br><span style='color:var(--dark);font-size:1rem;font-weight:600'>" + medicines + "</span></div>";
-  html += "<h3>Administration Guidelines</h3><table><thead><tr><th>Aspect</th><th>Recommendation</th></tr></thead><tbody>";
-  html += "<tr><td>Timing</td><td>Take at the same time each day for consistent blood levels</td></tr>";
-  html += "<tr><td>With Food</td><td>Take with meals unless the label specifies otherwise</td></tr>";
-  html += "<tr><td>Missed Dose</td><td>Take as soon as remembered — never double up</td></tr>";
-  html += "<tr><td>Storage</td><td>Cool, dry place — away from direct sunlight and moisture</td></tr>";
-  html += "<tr><td>Duration</td><td>Complete the full prescribed course even if feeling better</td></tr>";
-  html += "</tbody></table><h3>Side Effects to Watch</h3><ul class='styled'><li>Allergic reactions — hives, swelling, difficulty breathing</li><li>Severe dizziness or loss of balance</li><li>Unusual fatigue or cognitive changes</li><li>Gastrointestinal distress — severe nausea, vomiting, blood in stool</li></ul></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>💊</div><h2>Rx Prescribed Medication Protocol</h2></div>";
+  html += "<div class='box-burg'><span style='color:var(--burg);font-weight:800'>Prescribed Medications (" + currentProfile.treatmentPreference + "):</span><br><span style='color:var(--burg);font-size:1.1rem;font-weight:800'>" + medicines + "</span></div>";
+  html += "<h3>Rx Administration Schedule</h3><table class='rx-table'><thead><tr><th>Parameter</th><th>Clinical Recommendation</th></tr></thead><tbody>";
+  html += "<tr><td>Dosing Schedule</td><td>Administer at regular intervals to maintain steady blood plasma levels</td></tr>";
+  html += "<tr><td>Dietary Timing</td><td>Consume alongside meals unless contraindicated on prescription packaging</td></tr>";
+  html += "<tr><td>Missed Dose Protocol</td><td>Administer upon recollection; do not double dosage under any circumstance</td></tr>";
+  html += "<tr><td>Storage Conditions</td><td>Store in a cool, dry environment away from direct heat and moisture</td></tr>";
+  html += "<tr><td>Course Duration</td><td>Complete the full course as recommended by your physician</td></tr>";
+  html += "</tbody></table><h3>Side Effect Surveillance</h3><ul class='styled'><li>Anaphylactic signals — hives, dyspnea, facial/throat swelling</li><li>Severe vertigo, syncopal episodes, or motor unsteadiness</li><li>Unexplained lethargy, confusion, or disorientation</li><li>Gastrointestinal bleeding, persistent emesis, or severe abdominal pain</li></ul></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>⚡</div><h2>Essential Precautions</h2></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>⚡</div><h2>Essential Patient Precautions</h2></div>";
   html += "<div class='box-gold'>⚠️ &nbsp;" + precautions + "</div>";
-  html += "<h3>General Safety Rules</h3><ul class='styled'><li>No self-medication beyond what is listed — consult a provider first</li><li>Inform all healthcare providers of your current medications and allergies</li><li>Maintain hand hygiene and avoid close contact with sick individuals</li><li>Do not share medications with others under any circumstance</li></ul></div>";
+  html += "<h3>Safety Directives</h3><ul class='styled'><li>Do not initiate additional non-prescribed pharmaceuticals without medical consultation</li><li>Disclose full medication history and known allergies to attending clinicians</li><li>Maintain infection control protocols and personal hygiene</li><li>Do not reassign or share prescribed pharmaceuticals</li></ul></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>🥗</div><h2>Lifestyle & Dietary Guidance</h2></div>";
-  html += "<h3>Physical Activity</h3><ul class='styled'><li>Light walking 20–30 min daily is beneficial</li><li>Avoid strenuous exercise, heavy lifting, and prolonged standing until improved</li><li>Ensure adequate rest — do not push through fatigue</li></ul>";
-  html += "<h3>Sleep</h3><ul class='styled'><li>Target 7–9 hours per night — sleep is critical for recovery</li><li>Maintain a consistent sleep/wake schedule</li><li>Keep the room cool, dark, and quiet</li></ul>";
-  html += "<h3>Foods to Prioritize</h3><ul class='styled'><li>Fresh fruits and vegetables — rich in antioxidants and vitamins</li><li>Whole grains for sustained, stable energy</li><li>Lean proteins — fish, chicken, eggs, legumes</li><li>Healthy fats — avocado, olive oil, nuts</li></ul>";
-  html += "<h3>Foods to Avoid</h3><ul class='styled'><li>Highly processed or deep-fried foods</li><li>Refined sugars and sugary drinks</li><li>Excessive caffeine and alcohol</li><li>High-sodium snacks and fast food</li></ul>";
-  html += "<h3>Hydration Target</h3><div class='box-green'>💧 &nbsp;<strong>2.0 – 2.5 litres of water daily.</strong> Increase intake if experiencing fever, vomiting, or diarrhoea.</div></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>🥗</div><h2>Dietary, Hydration & Activity Plan</h2></div>";
+  html += "<h3>Physical Activity Limits</h3><ul class='styled'><li>Light ambulation (20–30 min daily) as tolerated</li><li>Avoid intense exertion, heavy lifting, or prolonged standing during acute phase</li><li>Prioritize physical rest when fatigued</li></ul>";
+  html += "<h3>Sleep Hygiene</h3><ul class='styled'><li>Maintain 7–9 hours of sleep per night to support tissue recovery</li><li>Keep dark, quiet, temperature-regulated sleep environment</li></ul>";
+  html += "<h3>Nutritional Guidelines</h3><ul class='styled'><li>Emphasize antioxidant-dense fruits, vegetables, and lean protein sources</li><li>Avoid processed, high-sodium, or fried foods</li><li>Limit caffeine, alcohol, and refined sugars</li></ul>";
+  html += "<h3>Daily Hydration Goal</h3><div class='box-green'>💧 &nbsp;<strong>Target: 2.0 – 2.5 Litres daily fluid intake.</strong> Increase fluid intake if pyrexia, emesis, or diarrhoea is present.</div></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>🚨</div><h2>Warning Signs</h2></div>";
-  html += "<h3>Seek Emergency Care Immediately If:</h3><div class='box-red'><ul class='styled red-list'>";
-  html += "<li>Difficulty breathing or shortness of breath at rest</li><li>Chest pain, tightness, or pressure</li><li>Sudden severe headache unlike anything before</li><li>Loss of consciousness or confusion</li><li>Fever above 39.4°C (103°F) unresponsive to medication</li><li>Signs of severe allergic reaction — throat swelling, rash spreading fast</li>";
-  html += "</ul></div><h3>Contact Your Doctor the Same Day If:</h3><ul class='styled'><li>Symptoms worsen significantly or rapidly</li><li>New concerning symptoms develop</li><li>Fever persists beyond 3 days</li><li>You are unable to keep fluids down</li><li>No improvement after 5–7 days of treatment</li></ul></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>🚨</div><h2>Emergency Red Flag Indicators</h2></div>";
+  html += "<h3>Seek Immediate Emergency Services (ER) If:</h3><div class='box-red'><ul class='styled red-list'>";
+  html += "<li>Severe dyspnea or acute respiratory distress at rest</li><li>Central chest pain, tightness, or pressure radiating to arm/jaw</li><li>Sudden severe thunderclap headache</li><li>Loss of consciousness, syncope, or acute confusion</li><li>High fever (>39.4°C / 103°F) refractory to antipyretics</li><li>Rapidly progressive allergic rash or airway compromise</li>";
+  html += "</ul></div><h3>Contact Primary Care Physician Same-Day If:</h3><ul class='styled'><li>Symptoms rapidly deteriorate despite therapy</li><li>Fever persists beyond 72 hours</li><li>Inability to retain oral fluids</li></ul></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>📅</div><h2>Follow-Up Schedule</h2></div><div class='timeline'>";
-  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Days 1–3</div><div class='tl-text'>Begin medication. Rest, hydrate, and monitor initial symptom response. Note any side effects.</div></div></div>";
-  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Days 3–5</div><div class='tl-text'>Self-assessment. Expect early signs of improvement. If worsening, contact provider.</div></div></div>";
-  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Week 1–2</div><div class='tl-text'>Visit a healthcare provider if no clear improvement. Bring this report and list of medications.</div></div></div>";
-  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Week 2–4</div><div class='tl-text'>Routine follow-up to confirm recovery. Discuss ongoing precautions with your doctor.</div></div></div>";
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>📅</div><h2>Structured Recovery Timeline</h2></div><div class='timeline'>";
+  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Stage 1: Days 1–3</div><div class='tl-text'>Initiate prescribed protocol. Rest, hydrate, and track initial symptom response.</div></div></div>";
+  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Stage 2: Days 3–5</div><div class='tl-text'>Re-evaluate condition. Early resolution expected. Contact physician if symptoms escalate.</div></div></div>";
+  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Stage 3: Week 1–2</div><div class='tl-text'>Clinical follow-up if incomplete recovery. Present this report to attending physician.</div></div></div>";
+  html += "<div class='tl-item'><div class='tl-dot'></div><div class='tl-content'><div class='tl-time'>Stage 4: Week 2–4</div><div class='tl-text'>Conclude recovery phase and maintain preventative lifestyle guidelines.</div></div></div>";
   html += "</div></div>";
 
-  html += "<div class='section'><div class='section-header'><div class='section-icon'>📈</div><h2>Prognosis</h2></div>";
-  html += "<div class='box-burg'>With consistent medication adherence and lifestyle adjustments, most patients with this diagnosis experience significant symptom improvement within <strong>1–2 weeks</strong> and full recovery within <strong>2–4 weeks</strong>.</div>";
-  html += "<h3>Key Recovery Factors</h3><ul class='styled'><li>Starting treatment early in the symptom course</li><li>Full medication adherence without skipping doses</li><li>Adequate rest, hydration, and nutrition</li><li>Avoiding triggers (substance use, poor diet, stress) during recovery</li><li>Timely follow-up if improvement is not observed</li></ul></div>";
+  html += "<div class='attestation'><div class='att-title'>📜 Official AI Triage Attestation & Medical Disclaimer</div>";
+  html += "<div class='att-body'><p>This prescription and triage summary is generated by <strong>PocketDoctor Mark 4</strong> utilizing Groq LLaMA-3.3 70B inference. This document is intended solely for preliminary clinical decision-support and does <strong>NOT</strong> substitute for formal physical examination, laboratory diagnostic testing, or professional medical advice.</p><p style='margin-top:6px'>In a medical emergency, contact emergency medical services immediately.</p></div>";
+  html += "<div class='sig-block'><span>Creator & Lead Engineer: <strong>Vaidik Khurana</strong></span><span>System: PocketDoctor Mark 4</span></div></div>";
 
-  html += "<div class='disclaimer'><h3>⚠️ Medical Disclaimer</h3>";
-  html += "<p>This report is an <strong>AI-generated preliminary assessment</strong> produced by PocketDoctor and does <strong>NOT</strong> constitute professional medical advice, diagnosis, or treatment.</p>";
-  html += "<p>All findings are based on self-reported symptoms and yes/no responses — not a physical examination, laboratory tests, or imaging. A qualified licensed healthcare professional must evaluate you before acting on this report.</p>";
-  html += "<p>In a medical emergency, <strong>contact emergency services immediately</strong> — do not rely on this document for urgent decisions.</p></div>";
-
-  html += "<div class='footer'>Generated by <span>PocketDoctor v3</span> · AI Diagnostic System · For informational use only</div>";
+  html += "<div class='footer'>Generated by <span>PocketDoctor Mark 4</span> · Designed & Engineered by <span>Vaidik Khurana</span> · For informational use only</div>";
   html += "</div></body></html>";
   return html;
 }
