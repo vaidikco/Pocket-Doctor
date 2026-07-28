@@ -111,6 +111,11 @@ bool inSymptomSelection = false;
 bool inDurationSelection = false;
 bool inGeminiQuestions = false;
 
+// Modes
+bool inModeSelection = false;
+int modeIndex = 0;
+bool isDailyCheckup = false;
+
 // Symptom lists
 const char* symptoms[] = {
   "Fever", "Cough", "Fatigue", "Headache", "Nausea",
@@ -1205,7 +1210,12 @@ String sendToGroq(String userMessage, bool isFinalDiagnosis) {
   conversationHistory += "{\"role\":\"user\",\"content\":\"" + escapeJson(userMessage) + "\"}";
 
   if (isFinalDiagnosis) {
-    String finalInstruction = "Based on all my answers and the initial symptoms I provided, provide a SHORT preliminary diagnosis in this EXACT format:\n\nDiagnosed Disease: [disease name only]\nAccuracy: [percentage]%\nMedicines: [2-3 medicine names only, no dosages]\nPrecautions: [2-3 key precautions in one short sentence]\nCritical: [Yes/No]\n\nKeep it VERY brief. Follow this format exactly.";
+    String finalInstruction = "";
+    if (isDailyCheckup) {
+      finalInstruction = "Based on the daily checkup, provide a SHORT summary in this EXACT format:\n\nStatus: [Safe/Needs Attention]\nRecovery Score: [0-100]%\nDaily Advice: [2-3 short tips]\nNext Steps: [Action to take]\nCritical: [Yes/No]\n\nKeep it VERY brief. Follow this format exactly.";
+    } else {
+      finalInstruction = "Based on all my answers and the initial symptoms I provided, provide a SHORT preliminary diagnosis in this EXACT format:\n\nDiagnosed Disease: [disease name only]\nAccuracy: [percentage]%\nMedicines: [2-3 medicine names only, no dosages]\nPrecautions: [2-3 key precautions in one short sentence]\nCritical: [Yes/No]\n\nKeep it VERY brief. Follow this format exactly.";
+    }
     conversationHistory += ",{\"role\":\"user\",\"content\":\"" + escapeJson(finalInstruction) + "\"}";
   }
 
@@ -1413,32 +1423,141 @@ String createComprehensiveHTMLReport() {
   return html;
 }
 
-void parseDiagnosis(String diagnosis) {
-  int diseasePos = diagnosis.indexOf("Diagnosed Disease:");
-  int accuracyPos = diagnosis.indexOf("Accuracy:");
-  int medicinesPos = diagnosis.indexOf("Medicines:");
-  int precautionsPos = diagnosis.indexOf("Precautions:");
-  int criticalPos = diagnosis.indexOf("Critical:");
+String createDailyCheckupHTMLReport() {
+  String html = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>";
+  html += "<title>PocketDoctor Mark 5 — Daily Checkup Report</title>";
+  html += "<link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>";
+  html += "<link href='https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' rel='stylesheet'>";
+  html += "<style>";
+  html += "*{margin:0;padding:0;box-sizing:border-box}";
+  html += ":root{--main:#0284C7;--main-mid:#0369A1;--main-bright:#0EA5E9;--accent:#38BDF8;--cream:#F0F9FF;--bg-canvas:#E0F2FE;--card-bg:rgba(255,255,255,0.92);--card-border:rgba(2,132,199,0.18);--shadow:0 16px 48px rgba(2,132,199,0.12);--text:#0C4A6E;--text-sub:#0369A1;--gold:#D97706;--green:#15803D;--red:#DC2626;--radius:22px;}";
+  html += "html{scroll-behavior:smooth}";
+  html += "body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(135deg,var(--cream) 0%,#E0F2FE 50%,var(--bg-canvas) 100%);color:var(--text);line-height:1.7;min-height:100vh;padding:36px 18px 70px}";
+  html += ".page{max-width:980px;margin:0 auto}";
+  html += ".rx-header{background:linear-gradient(135deg,var(--main) 0%,var(--main-mid) 60%,var(--main-bright) 100%);border-radius:var(--radius);padding:44px 40px 36px;margin-bottom:30px;position:relative;overflow:hidden;box-shadow:0 14px 40px rgba(2,132,199,0.32);color:#fff}";
+  html += ".rx-header::before{content:'Daily';position:absolute;right:20px;bottom:-15px;font-family:'Outfit',sans-serif;font-size:12rem;font-weight:800;color:rgba(255,255,255,0.06);pointer-events:none;line-height:1}";
+  html += ".header-top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:20px}";
+  html += ".rx-badge{display:flex;align-items:center;gap:16px}";
+  html += ".rx-logo{width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;font-size:30px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}";
+  html += ".rx-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-0.5px;color:#fff}";
+  html += ".rx-header-sub{color:rgba(255,255,255,0.85);font-size:0.86rem;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;font-weight:700}";
+  html += ".doc-stamp{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:14px;padding:10px 18px;text-align:right;backdrop-filter:blur(6px)}";
+  html += ".stamp-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.75);font-weight:700}";
+  html += ".stamp-val{font-size:0.95rem;font-weight:800;color:#fff;font-family:monospace}";
+  html += ".patient-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}";
+  html += ".p-chip{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.22);border-radius:30px;padding:8px 16px;font-size:0.84rem;color:#fff;font-weight:600;backdrop-filter:blur(6px);display:flex;align-items:center;gap:8px}";
+  html += ".summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin-bottom:30px}";
+  html += ".scard{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:24px 22px;box-shadow:var(--shadow);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);border-top:4px solid var(--main)}";
+  html += ".scard:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(2,132,199,0.16)}";
+  html += ".scard-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-sub);margin-bottom:8px;font-weight:700}";
+  html += ".scard-value{font-family:'Outfit',sans-serif;font-size:1.35rem;font-weight:800;color:var(--main)}.scard-value.red{color:var(--red)}.scard-value.green{color:var(--green)}.scard-value.gold{color:var(--gold)}";
+  html += ".scard-icon{font-size:1.8rem;margin-bottom:12px}";
+  html += ".critical-banner{background:linear-gradient(135deg,rgba(220,38,38,0.12),rgba(220,38,38,0.04));border:1.5px solid var(--red);border-radius:var(--radius);padding:24px 28px;margin-bottom:30px;display:flex;align-items:flex-start;gap:20px;box-shadow:0 10px 32px rgba(220,38,38,0.15)}";
+  html += ".critical-banner .icon{font-size:2.4rem;flex-shrink:0;animation:pulse 1.5s infinite}";
+  html += "@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.9)} }";
+  html += ".critical-banner h3{color:var(--red);font-size:1.15rem;font-weight:800;margin-bottom:4px}.critical-banner p{color:var(--text);font-size:0.94rem;font-weight:500}";
+  html += ".section{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);padding:32px 30px;margin-bottom:26px;box-shadow:var(--shadow)}";
+  html += ".section-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1.5px solid rgba(2,132,199,0.08)}";
+  html += ".section-icon{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--main),var(--main-bright));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;flex-shrink:0;box-shadow:0 6px 18px rgba(2,132,199,0.22)}";
+  html += ".section h2{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;color:var(--main)}.section h3{font-size:0.9rem;font-weight:700;color:var(--main-mid);margin:22px 0 12px;text-transform:uppercase;letter-spacing:1px}";
+  html += ".box-main{background:rgba(2,132,199,0.05);border:1px solid rgba(2,132,199,0.18);border-left:4px solid var(--main);border-radius:14px;padding:18px 22px;margin:14px 0}";
+  html += ".box-gold{background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.3);border-left:4px solid var(--gold);border-radius:14px;padding:18px 22px;margin:14px 0;color:#92400E}";
+  html += ".box-red{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.3);border-left:4px solid var(--red);border-radius:14px;padding:18px 22px;margin:14px 0}";
+  html += ".box-green{background:rgba(21,128,61,0.08);border:1px solid rgba(21,128,61,0.25);border-left:4px solid var(--green);border-radius:14px;padding:18px 22px;margin:14px 0;color:var(--green)}";
+  html += "ul.styled{list-style:none;padding:0;margin:10px 0}ul.styled li{padding:10px 0 10px 30px;position:relative;font-size:0.94rem;color:var(--text);border-bottom:1px solid rgba(2,132,199,0.06)}ul.styled li:last-child{border-bottom:none}ul.styled li::before{content:'▸';position:absolute;left:4px;color:var(--main-bright);font-size:1.1rem;font-weight:800;top:8px}ul.red-list li::before{color:var(--red)}";
+  html += ".acc-bar-wrap{background:rgba(2,132,199,0.08);border-radius:30px;height:14px;margin:10px 0;overflow:hidden;border:1px solid rgba(2,132,199,0.15)}.acc-bar{height:100%;border-radius:30px;background:linear-gradient(90deg,var(--main),var(--main-bright));transition:width 1s ease}";
+  html += ".attestation{background:rgba(2,132,199,0.03);border:1.5px solid rgba(2,132,199,0.15);border-radius:var(--radius);padding:28px;margin-top:34px;display:flex;flex-direction:column;gap:14px}";
+  html += ".att-title{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:var(--main);display:flex;align-items:center;gap:10px}";
+  html += ".att-body{font-size:0.86rem;color:var(--text-sub);line-height:1.75}";
+  html += ".sig-block{margin-top:12px;padding-top:14px;border-top:1px dashed rgba(2,132,199,0.2);display:flex;align-items:center;justify-content:space-between;font-size:0.82rem;color:var(--text-sub);font-weight:700}";
+  html += ".footer{text-align:center;margin-top:44px;color:var(--text-sub);font-size:0.84rem;letter-spacing:0.5px;font-weight:600}.footer span{color:var(--main);font-weight:800}";
+  html += "@media(max-width:600px){.rx-header{padding:30px 22px}.section{padding:24px 20px}.summary-row{grid-template-columns:1fr 1fr}}";
+  html += "</style></head><body><div class='page'>";
 
-  if (diseasePos != -1 && accuracyPos != -1) {
-    diagnosedDisease = diagnosis.substring(diseasePos + 18, accuracyPos);
-    diagnosedDisease.trim();
+  html += "<div class='rx-header'><div class='header-top'><div class='rx-badge'><div class='rx-logo'>🌅</div><div><h1>Daily Checkup Report</h1><div class='rx-header-sub'>PocketDoctor Mark 5 Autonomous Recovery Tracker</div></div></div><div class='doc-stamp'><div class='stamp-title'>System Model</div><div class='stamp-val'>MK5-BETA</div></div></div>";
+  html += "<div class='patient-grid'><div class='p-chip'>👤 <strong>" + currentProfile.name + "</strong></div><div class='p-chip'>🎂 <strong>" + String(currentProfile.age) + " yrs</strong></div><div class='p-chip'>⚖️ <strong>" + String(currentProfile.weight) + " kg</strong></div><div class='p-chip'>📏 <strong>" + String(currentProfile.height) + " cm</strong></div></div></div>";
+
+  html += "<div class='summary-row'>";
+  html += "<div class='scard'><div class='scard-icon'>📋</div><div class='scard-label'>Status</div><div class='scard-value'>" + diagnosedDisease + "</div></div>";
+  html += "<div class='scard'><div class='scard-icon'>📈</div><div class='scard-label'>Recovery Score</div><div class='scard-value gold'>" + accuracy + "</div></div>";
+  bool isCritical = critical.indexOf("Yes") >= 0;
+  html += "<div class='scard'><div class='scard-icon'>" + String(isCritical ? "🚨" : "✅") + "</div><div class='scard-label'>Condition Safety</div><div class='scard-value " + String(isCritical ? "red" : "green") + "'>" + String(isCritical ? "NEEDS ATTENTION" : "SAFE") + "</div></div>";
+  html += "</div>";
+
+  if (isCritical) {
+    html += "<div class='critical-banner'><div class='icon'>🚨</div><div><h3>ATTENTION REQUIRED</h3><p>Your responses indicate a potential safety concern or decline in recovery. Please consult a medical professional.</p></div></div>";
   }
-  if (accuracyPos != -1 && medicinesPos != -1) {
-    accuracy = diagnosis.substring(accuracyPos + 9, medicinesPos);
-    accuracy.trim();
-  }
-  if (medicinesPos != -1 && precautionsPos != -1) {
-    medicines = diagnosis.substring(medicinesPos + 10, precautionsPos);
-    medicines.trim();
-  }
-  if (precautionsPos != -1 && criticalPos != -1) {
-    precautions = diagnosis.substring(precautionsPos + 12, criticalPos);
-    precautions.trim();
-  }
-  if (criticalPos != -1) {
-    critical = diagnosis.substring(criticalPos + 9);
-    critical.trim();
+
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>💡</div><h2>Daily Advice & Tips</h2></div>";
+  html += "<div class='box-main'><strong style='color:var(--main);font-size:1.1rem'>Today's Focus:</strong><br><span style='color:var(--text)'>" + medicines + "</span></div></div>";
+
+  html += "<div class='section'><div class='section-header'><div class='section-icon'>🚀</div><h2>Next Steps</h2></div>";
+  html += "<div class='box-green'>" + precautions + "</div></div>";
+
+  html += "<div class='attestation'><div class='att-title'>📜 Official AI Checkup Attestation & Disclaimer</div>";
+  html += "<div class='att-body'><p>This daily checkup summary is generated by <strong>PocketDoctor Mark 5</strong>. This document is intended solely for preliminary tracking and does <strong>NOT</strong> substitute for formal physical examination, laboratory diagnostic testing, or professional medical advice.</p><p style='margin-top:6px'>In a medical emergency, contact emergency medical services immediately.</p></div>";
+  html += "<div class='sig-block'><span>Creator & Lead Engineer: <strong>Vaidik Khurana</strong></span><span>System: PocketDoctor Mark 5</span></div></div>";
+
+  html += "<div class='footer'>Generated by <span>PocketDoctor Mark 5</span> · Designed & Engineered by <span>Vaidik Khurana</span> · For informational use only</div>";
+  html += "</div></body></html>";
+  return html;
+}
+
+void parseDiagnosis(String diagnosis) {
+  if (isDailyCheckup) {
+    int statusPos = diagnosis.indexOf("Status:");
+    int recoveryPos = diagnosis.indexOf("Recovery Score:");
+    int advicePos = diagnosis.indexOf("Daily Advice:");
+    int stepsPos = diagnosis.indexOf("Next Steps:");
+    int criticalPos = diagnosis.indexOf("Critical:");
+
+    if (statusPos != -1 && recoveryPos != -1) {
+      diagnosedDisease = diagnosis.substring(statusPos + 7, recoveryPos);
+      diagnosedDisease.trim();
+    }
+    if (recoveryPos != -1 && advicePos != -1) {
+      accuracy = diagnosis.substring(recoveryPos + 15, advicePos);
+      accuracy.trim();
+    }
+    if (advicePos != -1 && stepsPos != -1) {
+      medicines = diagnosis.substring(advicePos + 13, stepsPos);
+      medicines.trim();
+    }
+    if (stepsPos != -1 && criticalPos != -1) {
+      precautions = diagnosis.substring(stepsPos + 11, criticalPos);
+      precautions.trim();
+    }
+    if (criticalPos != -1) {
+      critical = diagnosis.substring(criticalPos + 9);
+      critical.trim();
+    }
+  } else {
+    int diseasePos = diagnosis.indexOf("Diagnosed Disease:");
+    int accuracyPos = diagnosis.indexOf("Accuracy:");
+    int medicinesPos = diagnosis.indexOf("Medicines:");
+    int precautionsPos = diagnosis.indexOf("Precautions:");
+    int criticalPos = diagnosis.indexOf("Critical:");
+
+    if (diseasePos != -1 && accuracyPos != -1) {
+      diagnosedDisease = diagnosis.substring(diseasePos + 18, accuracyPos);
+      diagnosedDisease.trim();
+    }
+    if (accuracyPos != -1 && medicinesPos != -1) {
+      accuracy = diagnosis.substring(accuracyPos + 9, medicinesPos);
+      accuracy.trim();
+    }
+    if (medicinesPos != -1 && precautionsPos != -1) {
+      medicines = diagnosis.substring(medicinesPos + 10, precautionsPos);
+      medicines.trim();
+    }
+    if (precautionsPos != -1 && criticalPos != -1) {
+      precautions = diagnosis.substring(precautionsPos + 12, criticalPos);
+      precautions.trim();
+    }
+    if (criticalPos != -1) {
+      critical = diagnosis.substring(criticalPos + 9);
+      critical.trim();
+    }
   }
 }
 
@@ -1504,8 +1623,12 @@ void startGroqDiagnosisWithData() {
 
   String symptomList = buildSymptomList();
   String profileContext = buildProfileContext();
-  String initialContext = profileContext + "Symptoms: " + symptomList + ". Duration: " + String(durations[selectedDurationIndex]) +
-                         ". Ask 10 strategic yes/no questions (max 10 words each). Output one question only each time [I REPEAT ONE EACH TIME.], and cover all related aspects for efficiency. Cover different aspects: location, intensity, timing, triggers. No extra text, ONLY question.";
+  String initialContext = profileContext + "Symptoms: " + symptomList + ". Duration: " + String(durations[selectedDurationIndex]);
+  if (isDailyCheckup) {
+    initialContext += ". This is a daily checkup. Ask up to 5 strategic yes/no questions to determine if the patient is safe, recovering well, or needs attention. Output one question only each time [I REPEAT ONE EACH TIME]. No extra text, ONLY question.";
+  } else {
+    initialContext += ". Ask 10 strategic yes/no questions (max 10 words each). Output one question only each time [I REPEAT ONE EACH TIME.], and cover all related aspects for efficiency. Cover different aspects: location, intensity, timing, triggers. No extra text, ONLY question.";
+  }
 
   Serial.println("\n=== INITIAL CONTEXT ===");
   Serial.println("Symptoms: " + symptomList);
@@ -1546,7 +1669,8 @@ void handleGeminiQuestions() {
     showLoadingScreen("Sending answer...", "Processing");
     questionCount++;
 
-    if (questionCount <= maxQuestions) {
+    int currentMaxQuestions = isDailyCheckup ? 5 : 10;
+    if (questionCount <= currentMaxQuestions) {
       currentQuestion = sendToGroq(answer, false);
     } else {
       showLoadingScreen("Final analysis...", "Computing");
@@ -1564,7 +1688,11 @@ void handleGeminiQuestions() {
 
       showLoadingScreen("Building report...", "Formatting");
       delay(500);
-      htmlReport = createComprehensiveHTMLReport();
+      if (isDailyCheckup) {
+        htmlReport = createDailyCheckupHTMLReport();
+      } else {
+        htmlReport = createComprehensiveHTMLReport();
+      }
       reportReady = true;
 
       Serial.println("\n╔════════════════════════════════════════╗");
@@ -1605,10 +1733,11 @@ void handleGeminiQuestions() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setCursor(0, 0);
+  int currentMaxQuestions = isDailyCheckup ? 5 : 10;
   display.print("Q");
   display.print(questionCount);
   display.print("/");
-  display.print(maxQuestions);
+  display.print(currentMaxQuestions);
   display.println(":");
   display.println("------------");
   String displayText = currentQuestion;
@@ -1718,11 +1847,11 @@ void loop() {
   int swState = digitalRead(SW);
   unsigned long now = millis();
 
-  // Main menu – press to start symptom selection
-  if (!inSymptomSelection && !inDurationSelection && !inGeminiQuestions) {
+  // Main menu – press to start mode selection
+  if (!inSymptomSelection && !inDurationSelection && !inGeminiQuestions && !inModeSelection) {
     if (swState == LOW && (now - lastMove > debounceDelay)) {
-      inSymptomSelection = true;
-      symptomIndex = 0;
+      inModeSelection = true;
+      modeIndex = 0;
       lastMove = now;
     }
 
@@ -1742,6 +1871,51 @@ void loop() {
     display.setCursor(10, 50);
     display.println("Press to Start");
     display.display();
+  }
+
+  // Mode selection
+  if (inModeSelection) {
+    if (yValue < (2048 - joyThreshold) && (now - lastMove > debounceDelay)) {
+      modeIndex--;
+      if (modeIndex < 0) modeIndex = 0;
+      lastMove = now;
+    }
+    if (yValue > (2048 + joyThreshold) && (now - lastMove > debounceDelay)) {
+      modeIndex++;
+      if (modeIndex > 1) modeIndex = 1;
+      lastMove = now;
+    }
+    if (swState == LOW && (now - lastMove > debounceDelay)) {
+      isDailyCheckup = (modeIndex == 1);
+      inModeSelection = false;
+      inSymptomSelection = true;
+      symptomIndex = 0;
+      lastMove = now;
+    }
+
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(0, 0);
+    display.println("Select Mode:");
+    display.setCursor(5, 20);
+    if (modeIndex == 0) display.print("> ");
+    else display.print("  ");
+    display.println("New Diagnosis");
+    
+    display.setCursor(5, 35);
+    if (modeIndex == 1) display.print("> ");
+    else display.print("  ");
+    display.println("Daily Checkup");
+
+    display.setCursor(0, 54);
+    if (WiFi.status() == WL_CONNECTED) {
+      display.print("Loc Sync: ");
+      display.print(WiFi.localIP().toString());
+    } else {
+      display.print("Loc Sync: OFFLINE");
+    }
+    display.display();
+    return;
   }
 
   // Groq Q&A session
